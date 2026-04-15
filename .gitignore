@@ -1,0 +1,20 @@
+# Mac
+.DS_Store
+
+# Virtual environment
+venv/
+
+# Large data files
+*.csv
+*.pt
+*.pkl
+*.geojson
+
+# Raw data folders
+SC3021_rainfall/
+HistoricalRainfallacrossSingapore*/
+Historical4dayWeatherForecast*.csv
+sgcharts/
+
+# Keep the bulletin CSV (small, needed for reference)
+!WeeklyInfectiousDiseaseBulletinCases.csv
