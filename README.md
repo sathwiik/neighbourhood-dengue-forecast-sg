@@ -19,18 +19,15 @@ Singapore experiences recurring dengue outbreaks driven by complex interactions 
 ## Repository Structure
 
 ```
-dengue-cluster-prediction/
+neighbourhood-dengue-forecast-sg/
 ├── dengue_cluster_prediction.ipynb   # Full pipeline: data → features → models → results
-├── data/
-│   └── raw/                          # Source data (not tracked — see Data Sources)
-│       ├── sgcharts/                 # Dengue cluster snapshots (CSV per date)
-│       ├── SC3021_rainfall/          # Daily rainfall by station, 2016
-│       ├── Historical4dayWeatherForecast{2016..2020}.csv
-│       ├── WeeklyInfectiousDiseaseBulletinCases.csv
-│       └── ura_subzones.geojson      # URA planning subzone boundaries
-└── scripts/
-    ├── pipeline.py                   # Data loading → feature engineering → model training
-    └── inspect_sgcharts.py           # Utility: merge all SGCharts CSVs → dengue_all.csv
+└── data/
+    └── raw/                          # Source data (not tracked — see Data Sources)
+        ├── sgcharts/                 # Dengue cluster snapshots (CSV per date)
+        ├── SC3021_rainfall/          # Daily rainfall by station, 2016
+        ├── Historical4dayWeatherForecast{2016..2020}.csv
+        ├── WeeklyInfectiousDiseaseBulletinCases.csv
+        └── ura_subzones.geojson      # URA planning subzone boundaries
 ```
 
 ---
