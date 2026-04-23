@@ -1,6 +1,6 @@
 # Dengue Cluster Prediction in Singapore
 
-> Predicting the emergence and intensity of dengue outbreak clusters **2–4 weeks in advance** using localised weather patterns and historical case data.
+> Predicting the emergence and intensity of dengue outbreak clusters **2 weeks in advance** using localised weather patterns and historical case data.
 
 Singapore experiences recurring dengue outbreaks driven by complex interactions between climate, urban density, and vector behaviour. This project builds a geospatial machine learning pipeline that forecasts future active cluster locations at the **URA subzone level**, giving public health agencies an actionable early-warning signal.
 
