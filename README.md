@@ -11,7 +11,7 @@ Singapore experiences recurring dengue outbreaks driven by complex interactions 
 - **End-to-end pipeline** — raw data ingestion, spatial feature engineering, model training, and evaluation in a single notebook
 - **Geospatial reasoning** — dengue snapshots geocoded and joined to URA planning subzones via `geopandas`
 - **Multi-source data fusion** — cluster case records, daily rainfall, 4-day weather forecasts, and national disease bulletins aligned on a common weekly grid
-- **Two deep learning architectures** compared: LSTM and a custom dual-input Transformer
+- **Custom Transformer encoder** benchmarked against a logistic regression baseline
 - **Rigorous evaluation** — rolling time-series cross-validation with area-calibrated precision thresholds
 
 ---
@@ -30,11 +30,7 @@ dengue-cluster-prediction/
 │       └── ura_subzones.geojson      # URA planning subzone boundaries
 └── scripts/
     ├── pipeline.py                   # Data loading → feature engineering → model training
-    ├── inspect_sgcharts.py           # Utility: merge all SGCharts CSVs → dengue_all.csv
-    ├── lstm_active_only.py           # LSTM on active-only subzone-weeks (rolling CV)
-    ├── transformer_v1.py             # Single-stream Transformer with forecast weather steps
-    ├── transformer_dual.py           # Dual-input Transformer (local + national trend)
-    └── transformer_holdout.py        # Side-by-side holdout evaluation: V1 vs V2
+    └── inspect_sgcharts.py           # Utility: merge all SGCharts CSVs → dengue_all.csv
 ```
 
 ---
@@ -53,17 +49,26 @@ dengue-cluster-prediction/
 
 ## Models
 
-### LSTM — Active-Only
-Trained exclusively on subzone-weeks with at least one recorded case, removing the heavy class imbalance of zero-case weeks. Rolling-window cross-validation with three precision threshold strategies: fixed count, per-subzone historical mean, and area-proportional calibration.
+### Transformer (Primary Model)
+A custom Transformer encoder trained to predict subzone-level dengue case counts **2 weeks ahead**. Self-attention allows the model to directly relate any two weeks in the input window — a rainfall event in week 1 and a temperature spike in week 5 can jointly influence the prediction, unlike sequential models that process steps one at a time.
 
-### Transformer V1 — Single-Stream
-An 8-step input sequence combining 6 weeks of historical weather and case data with 2 weeks of forecast weather, allowing the model to incorporate forward-looking meteorological signals. Evaluated on 2019 and 2020 test folds.
+- **Input:** 8-step sequence — 6 historical weeks + 2 forecast weather steps
+- **Features per step:** weather (8) + national cases (1) + local cases (1) + forecast flag + seasonality = 13 dims
+- **Outbreak threshold:** NEA epidemic definition (30 cases / 100,000 / week) converted to a per-km² area-calibrated threshold
+- **Loss:** weighted MSE giving outbreak weeks up to 9× more influence, preventing collapse to predicting the mean
 
-### Transformer V2 — Dual-Input
-Two parallel input streams — a local sequence encoder and a separate MLP processing the national case trend — are fused before the prediction head. This disentangles local cluster dynamics from island-wide outbreak momentum. Evaluated on 2019 and 2020 test folds.
+### Logistic Regression (Baseline)
+A standard logistic regression trained on the same features and folds, used as a performance benchmark.
 
-### Holdout Comparison
-V1 and V2 are benchmarked on a fixed 10% holdout (every 10th week across 2016–2020) to measure generalisation independently of fold choice.
+### Evaluation
+Two temporal folds with rolling forward training windows:
+
+| Fold | Train | Test |
+|------|-------|------|
+| 1 | 2016 – 2018 | 2019 |
+| 2 | 2016 – 2019 | 2020 |
+
+The Transformer outperforms logistic regression on the 2019 fold. On the 2020 fold — which saw a 2.2× national case spike — the baseline benefits from higher false-positive rates being rewarded by the unusual outbreak density.
 
 ---
 
